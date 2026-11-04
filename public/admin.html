@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="hy">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>YBS Ադմին</title>
+    <link rel="icon" href="assets/logo.webp" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@600;700&family=Noto+Sans+Armenian:wght@400;500;600;700&display=swap"
+    />
+    <style>
+      :root {
+        --ink: #17191d;
+        --paper: #f1eee6;
+        --surface: #fbfaf6;
+        --muted: #596764;
+        --brand: #3c9a9c;
+        --brand-text: #267477;
+        --brand-deep: #123e42;
+        --brand-soft: #e2eae5;
+        --line: rgba(18, 62, 66, 0.16);
+        --danger: #a23b2a;
+        --danger-soft: #f6e3de;
+        --warn: #8a6510;
+        --warn-soft: #f7edd2;
+        --ok: #2f7a4f;
+        --radius: 12px;
+        --font: "DM Sans", "Noto Sans Armenian", system-ui, sans-serif;
+        --font-head: "Manrope", "Noto Sans Armenian", system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 15px; -webkit-font-smoothing: antialiased; }
+      button, input, select, textarea { font: inherit; color: inherit; }
+      [hidden] { display: none !important; }
+      a { color: var(--brand-text); }
+      h1, h2, h3 { font-family: var(--font-head); letter-spacing: -0.01em; margin: 0; }
+
+      .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; text-decoration: none; color: var(--ink); }
+      .btn:hover { border-color: var(--brand); }
+      .btn:disabled { opacity: 0.5; cursor: default; }
+      .btn.primary { background: var(--brand-deep); border-color: var(--brand-deep); color: #fff; }
+      .btn.primary:hover:not(:disabled) { background: #20585c; }
+      .btn.danger { color: var(--danger); }
+      .btn.danger:hover { border-color: var(--danger); background: var(--danger-soft); }
+      .btn.small { min-height: 30px; padding: 0 11px; font-size: 13px; }
+      .btn.icon { width: 32px; min-height: 32px; padding: 0; }
+      .btn:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+      input[type="text"], input[type="password"], input[type="url"], input[type="search"], select, textarea {
+        width: 100%; border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 8px 10px; min-height: 38px;
+      }
+      textarea { resize: vertical; min-height: 40px; line-height: 1.45; }
+      label.field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 500; }
+      .check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
+
+      /* Login */
+      .login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+      .login-card { width: min(400px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 32px 28px; display: grid; gap: 18px; box-shadow: 0 20px 50px rgba(18, 62, 66, 0.08); }
+      .login-card img { height: 44px; width: auto; justify-self: start; }
+      .login-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+      .msg { font-size: 14px; padding: 10px 12px; border-radius: 8px; line-height: 1.45; }
+      .msg.error { background: var(--danger-soft); color: var(--danger); }
+      .msg.ok { background: var(--brand-soft); color: var(--brand-deep); }
+      .msg.warn { background: var(--warn-soft); color: var(--warn); }
+
+      /* Shell */
+      .topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: rgba(241, 238, 230, 0.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+      .topbar img { height: 32px; width: auto; }
+      .topbar .title { font-family: var(--font-head); font-weight: 700; font-size: 15px; }
+      .topbar .spacer { flex: 1; }
+      .save-state { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+      .save-state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+      .save-state.dirty { color: var(--warn); }
+      .save-state.dirty::before { background: #d39b19; }
+      .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0; min-height: calc(100vh - 58px); }
+      .sidenav { border-right: 1px solid var(--line); padding: 18px 12px; display: flex; flex-direction: column; gap: 2px; position: sticky; top: 58px; align-self: start; height: calc(100vh - 58px); }
+      .sidenav button { text-align: left; border: 0; background: none; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-weight: 500; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+      .sidenav button:hover { background: rgba(18, 62, 66, 0.05); color: var(--ink); }
+      .sidenav button[aria-current="page"] { background: var(--brand-deep); color: #fff; }
+      .sidenav .count { font-size: 12px; opacity: 0.75; }
+      .sidenav .grow { flex: 1; }
+      main { padding: 24px 28px 80px; min-width: 0; }
+      .panel-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+      .panel-head h2 { font-size: 24px; }
+      .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 14px; max-width: 640px; line-height: 1.5; }
+      .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+      .toolbar input[type="search"] { width: min(320px, 100%); }
+      .toolbar select { width: auto; }
+      .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--surface); }
+      .seg button { border: 0; background: none; padding: 6px 14px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--muted); }
+      .seg button[aria-pressed="true"] { background: var(--brand-deep); color: #fff; }
+
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+      .stack { display: grid; gap: 12px; }
+
+      /* Texts */
+      .group-title { font-family: var(--font-head); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-text); margin: 22px 0 8px; }
+      .text-row { display: grid; gap: 8px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; }
+      .text-row.changed { border-color: #d6b65c; box-shadow: inset 3px 0 0 #d39b19; }
+      .text-row .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+      .text-row .key { font-size: 12px; color: var(--muted); font-family: ui-monospace, monospace; }
+      .text-row .tag { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-deep); margin-left: 6px; font-family: var(--font); }
+      .langs { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 8px; }
+      .lang-cell { display: grid; gap: 3px; }
+      .lang-cell span { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; }
+      .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+
+      /* Programs */
+      .program { display: grid; gap: 14px; }
+      .program-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .program-head h3 { font-size: 17px; }
+      .price-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; margin-bottom: 6px; }
+      .program-settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+      .program.is-hidden { opacity: 0.6; }
+      .program-head .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-deep); font-weight: 600; font-family: var(--font); vertical-align: middle; }
+      details.more summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--brand-text); padding: 4px 0; }
+      details.more[open] summary { margin-bottom: 8px; }
+
+      /* People / partners */
+      .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+      .person-card { display: grid; gap: 10px; align-content: start; }
+      .person-card.is-hidden, .partner-row.is-hidden { opacity: 0.55; }
+      .photo-line { display: flex; gap: 12px; align-items: center; }
+      .photo { width: 76px; height: 92px; border-radius: 10px; background: var(--brand-soft) center/cover no-repeat; flex: none; border: 1px solid var(--line); }
+      .logo-box { width: 120px; height: 56px; border-radius: 8px; background: #fff center/contain no-repeat; border: 1px solid var(--line); flex: none; background-origin: content-box; padding: 6px; }
+      .row-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+      .partner-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: center; }
+      .partner-fields { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .partner-fields .row-actions { grid-column: 1 / -1; }
+
+      /* Applications */
+      .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-height: 70vh; }
+      table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+      th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { position: sticky; top: 0; background: #eef1ec; font-weight: 600; white-space: nowrap; z-index: 1; }
+      td { max-width: 320px; }
+      tr:hover td { background: rgba(60, 154, 156, 0.05); }
+      .stat { display: inline-flex; gap: 6px; align-items: baseline; font-size: 14px; color: var(--muted); }
+      .stat strong { font-size: 20px; color: var(--ink); font-family: var(--font-head); }
+
+      .history-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .history-item small { color: var(--muted); }
+
+      .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 11px 18px; border-radius: 999px; font-size: 14px; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-width: calc(100% - 32px); }
+      .toast.error { background: var(--danger); }
+      .loading { color: var(--muted); padding: 24px 0; }
+
+      @media (max-width: 860px) {
+        .layout { grid-template-columns: 1fr; }
+        .sidenav { position: sticky; top: 54px; z-index: 15; height: auto; flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 8px 12px; background: var(--paper); }
+        .sidenav button { white-space: nowrap; padding: 8px 12px; }
+        .sidenav .grow, .sidenav .count { display: none; }
+        main { padding: 18px 16px 80px; }
+        .topbar { padding: 8px 16px; }
+        .topbar .title, .topbar .view-site { display: none; }
+        .topbar img { height: 28px; }
+        .save-state { font-size: 0; gap: 0; }
+        .save-state::before { width: 10px; height: 10px; }
+        #save-btn .long { display: none; }
+        #save-btn { padding: 0 14px; }
+        .langs { grid-template-columns: 1fr; }
+        .partner-fields { grid-template-columns: 1fr; }
+        .price-row { grid-template-columns: 1fr 1fr auto; }
+        .logo-box { width: 84px; height: 48px; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login -->
+    <section class="login" id="login-view">
+      <form class="login-card" id="login-form">
+        <img src="assets/logo.webp" alt="Yerevan Business School" />
+        <div>
+          <h1 style="font-size: 22px">Կայքի կառավարում</h1>
+          <p style="margin-top: 6px">Մուտք գործեք՝ կայքի տեքստերը, գները, դասախոսներին ու գործընկերներին խմբագրելու և հայտերը դիտելու համար։</p>
+        </div>
+        <label class="field">Գաղտնաբառ
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+        <div class="msg error" id="login-error" hidden></div>
+        <button class="btn primary" type="submit" id="login-btn">Մուտք</button>
+      </form>
+    </section>
+
+    <!-- App -->
+    <div id="app" hidden>
+      <header class="topbar">
+        <img src="assets/logo.webp" alt="" />
+        <span class="title">Կայքի կառավարում</span>
+        <span class="spacer"></span>
+        <span class="save-state" id="save-state">Պահպանված է</span>
+        <a class="btn small view-site" href="./?fresh" target="_blank" rel="noopener">Դիտել կայքը ↗</a>
+        <button class="btn primary" id="save-btn" type="button" disabled>Պահպանել<span class="long">&nbsp;և հրապարակել</span></button>
+      </header>
+      <div class="layout">
+        <nav class="sidenav" id="sidenav" aria-label="Բաժիններ">
+          <button type="button" data-tab="texts">Տեքստեր</button>
+          <button type="button" data-tab="programs">Ծրագրեր և գներ</button>
+          <button type="button" data-tab="faculty">Դասախոսներ <span class="count" id="count-faculty"></span></button>
+          <button type="button" data-tab="partners">Գործընկերներ <span class="count" id="count-partners"></span></button>
+          <button type="button" data-tab="applications">Հայտեր <span class="count" id="count-apps"></span></button>
+          <button type="button" data-tab="history">Պատմություն</button>
+          <span class="grow"></span>
+          <button type="button" data-tab="settings">Կարգավորումներ</button>
+        </nav>
+        <main id="main">
+          <div class="loading" id="boot-loading">Բեռնվում է…</div>
+
+          <!-- Texts -->
+          <section data-panel="texts" hidden>
+            <div class="panel-head">
+              <div>
+                <h2>Տեքստեր</h2>
+                <p>Կայքի բոլոր տեքստերը երեք լեզվով։ Փոփոխված դաշտերը նշվում են դեղին գծով։ Փոփոխությունները կայքում կերևան «Պահպանել և հրապարակել» սեղմելուց հետո։</p>
+              </div>
+            </div>
+            <div class="toolbar">
+              <input type="search" id="text-search" placeholder="Որոնել տեքստ…" />
+              <select id="text-group"></select>
+              <label class="check"><input type="checkbox" id="text-changed" /> Միայն փոփոխվածները</label>
+              <span class="seg" id="text-langs" role="group" aria-label="Լեզուներ">
+                <button type="button" data-lang="en" aria-pressed="true">EN</button>
+                <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+                <button type="button" data-lang="hy" aria-pressed="true">ՀԱՅ</button>
+              </span>
+            </div>
+            <div id="text-list"></div>
+          </section>
+
+          <!-- Programs -->
+          <section data-panel="programs" hidden>
+            <div class="panel-head">
+              <div>
+                <h2>Ծրագրեր և գներ</h2>
+                <p>Ավելացրեք նոր ծրագրեր, թաքցրեք կամ փոխեք հերթականությունը, խմբագրեք ամսաթվերը, գներն ու տեքստերը։ Մեկնարկի ամսաթիվը և գները ընտրված լեզվի համար են։</p>
+              </div>
+              <div class="row-actions">
+                <span class="seg" id="program-lang" role="group" aria-label="Լեզու">
+                  <button type="button" data-lang="en">EN</button>
+                  <button type="button" data-lang="ru">RU</button>
+                  <button type="button" data-lang="hy" aria-pressed="true">ՀԱՅ</button>
+                </span>
+                <button class="btn primary" type="button" id="add-program">+ Նոր ծրագիր</button>
+              </div>
+            </div>
+            <div class="stack" id="program-list"></div>
+          </section>
+
+          <!-- Faculty -->
+          <section data-panel="faculty" hidden>
+            <div class="panel-head">
+              <div>
+                <h2>Դասախոսներ</h2>
+                <p>Ավելացրեք, հեռացրեք, փոխեք հերթականությունը կամ նկարը։ «Թաքցնել»-ը դասախոսին հանում է կայքից՝ առանց ջնջելու։</p>
+              </div>
+              <button class="btn primary" type="button" id="add-person">+ Ավելացնել դասախոս</button>
+            </div>
+            <div class="grid-cards" id="faculty-list"></div>
+          </section>
+
+          <!-- Partners -->
+          <section data-panel="partners" hidden>
+            <div class="panel-head">
+              <div>
+                <h2>Գործընկերներ</h2>
+                <p>Լոգոները կայքում ցուցադրվում են պտտվող ժապավենով։ Լավագույնը թափանցիկ ֆոնով PNG/WebP/SVG լոգոներն են։ «Մգեցնել»-ը օգտակար է սպիտակ լոգոների համար։</p>
+              </div>
+              <button class="btn primary" type="button" id="add-partner">+ Ավելացնել գործընկեր</button>
+            </div>
+            <div class="stack" id="partner-list"></div>
+          </section>
+
+          <!-- Applications -->
+          <section data-panel="applications" hidden>
+            <div class="panel-head">
+              <div>
+                <h2>Հայտեր</h2>
+                <p>Կայքի դիմումի ձևով ուղարկված հայտերը (նորերը՝ վերևում)։ Աղյուսակը պահվում է Google Sheets-ում։</p>
+              </div>
+              <div class="row-actions">
+                <button class="btn small" type="button" id="apps-refresh">Թարմացնել</button>
+                <button class="btn small" type="button" id="apps-csv">Ներբեռնել CSV</button>
+                <a class="btn small" id="apps-sheet" target="_blank" rel="noopener" hidden>Բացել Google Sheets-ում ↗</a>
+              </div>
+            </div>
+            <div class="toolbar">
+              <input type="search" id="apps-search" placeholder="Որոնել անուն, email, հեռախոս…" />
+              <select id="apps-program"><option value="">Բոլոր ծրագրերը</option></select>
+              <span class="stat"><strong id="apps-count">0</strong> հայտ</span>
+            </div>
+            <div id="apps-body"><div class="loading">Բեռնվում է…</div></div>
+          </section>
+
+          <!-- History -->
+          <section data-panel="history" hidden>
+            <div class="panel-head">
+              <div>
+                <h2>Պատմություն</h2>
+                <p>Յուրաքանչյուր հրապարակում պահվում է։ Սխալի դեպքում կարող եք վերադարձնել նախորդ տարբերակը (պահվում են վերջին 40-ը)։</p>
+              </div>
+              <button class="btn small" type="button" id="history-refresh">Թարմացնել</button>
+            </div>
+            <div class="stack" id="history-list"></div>
+          </section>
+
+          <!-- Settings -->
+          <section data-panel="settings" hidden>
+            <div class="panel-head"><div><h2>Կարգավորումներ</h2></div></div>
+            <div class="stack" style="max-width: 560px">
+              <form class="card stack" id="password-form">
+                <h3 style="font-size: 16px">Փոխել գաղտնաբառը</h3>
+                <label class="field">Ընթացիկ գաղտնաբառ<input type="password" name="old" autocomplete="current-password" required /></label>
+                <label class="field">Նոր գաղտնաբառ (առնվազն 8 նիշ)<input type="password" name="new" minlength="8" autocomplete="new-password" required /></label>
+                <label class="field">Կրկնել նոր գաղտնաբառը<input type="password" name="repeat" minlength="8" autocomplete="new-password" required /></label>
+                <div class="msg" id="password-msg" hidden></div>
+                <div><button class="btn primary" type="submit">Փոխել</button></div>
+              </form>
+              <div class="card stack">
+                <h3 style="font-size: 16px">Պահուստային պատճեն</h3>
+                <p style="margin: 0; color: var(--muted); font-size: 14px">Ներբեռնեք կայքի ամբողջ բովանդակությունը JSON ֆայլով կամ վերականգնեք նախկինում պահված ֆայլից (ներմուծելուց հետո սեղմեք «Պահպանել և հրապարակել»)։</p>
+                <div class="row-actions">
+                  <button class="btn small" type="button" id="export-json">Ներբեռնել JSON</button>
+                  <label class="btn small">Ներմուծել JSON<input type="file" accept="application/json,.json" id="import-json" hidden /></label>
+                </div>
+              </div>
+              <div class="card stack">
+                <h3 style="font-size: 16px">Չհրապարակված փոփոխություններ</h3>
+                <div class="row-actions">
+                  <button class="btn small danger" type="button" id="discard">Չեղարկել բոլոր չպահպանված փոփոխությունները</button>
+                </div>
+              </div>
+              <div><button class="btn" type="button" id="logout">Դուրս գալ</button></div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="content.js?v=20261019b"></script>
+    <script>
+      (() => {
+        "use strict";
+        const ENDPOINT = window.YBS_ENDPOINT || "";
+        const DEFAULTS = window.YBS_DEFAULTS || {};
+        const LANGS = ["en", "ru", "hy"];
+        const LANG_LABEL = { en: "EN", ru: "RU", hy: "ՀԱՅ" };
+        const TOKEN_KEY = "ybs_admin_token";
+        const DRAFT_KEY = "ybs_admin_draft";
+        const GROUP_NAMES = {
+          nav: "Մենյու", hero: "Գլխավոր բաժին", upcoming: "Մոտակա դասընթացներ", status: "Կարգավիճակներ",
+          clients: "Հաճախորդներ", metrics: "Թվեր", programs: "Ծրագրեր բաժին", course: "Ծրագրերի քարտեր",
+          faculty: "Դասախոսներ բաժին", partners: "Գործընկերներ բաժին", apply: "Դիմում բաժին", form: "Դիմումի ձև",
+          modal: "Ծրագրի պատուհան", footer: "Ստորին հատված", menu: "Մենյու",
+        };
+        const PROGRAM_NAMES_FALLBACK = { default: "Գինը, եթե ծրագրի համար նշված չէ" };
+        const ERRORS = {
+          wrong_password: "Սխալ գաղտնաբառ։",
+          locked: "Չափազանց շատ սխալ փորձեր։ Փորձեք 15 րոպեից։",
+          not_configured: "Ադմինկան դեռ կարգավորված չէ․ Apps Script-ում գործարկեք setup()-ը (տե՛ս ուղեցույցը)։",
+          unauthorized: "Մուտքի ժամկետն ավարտվել է։ Մուտք գործեք կրկին։",
+          conflict: "Մեկ ուրիշը նոր է պահպանել փոփոխություններ։",
+          image_too_large: "Նկարը չափազանց մեծ է։",
+          unsupported_image_type: "Այս ֆորմատի նկար չի ընդունվում։",
+          password_too_short: "Նոր գաղտնաբառը պետք է լինի առնվազն 8 նիշ։",
+          unknown_action: "Apps Script-ը թարմացված չէ․ տեղադրեք նոր տարբերակը (տե՛ս ուղեցույցը)։",
+          network: "Չհաջողվեց կապվել սերվերի հետ։ Ստուգեք ինտերնետը։",
+        };
+
+        const $ = (sel, root = document) => root.querySelector(sel);
+        const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+        const clone = (v) => (v == null ? v : JSON.parse(JSON.stringify(v)));
+        const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        function h(tag, attrs = {}, ...children) {
+          const el = document.createElement(tag);
+          for (const [k, v] of Object.entries(attrs || {})) {
+            if (v == null || v === false) continue;
+            if (k === "class") el.className = v;
+            else if (k === "style") el.style.cssText = v;
+            else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+            else if (k === "value") el.value = v;
+            else if (k === "checked") el.checked = !!v;
+            else el.setAttribute(k, v === true ? "" : v);
+          }
+          for (const c of children.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : String(c));
+          return el;
+        }
+        const store = {
+          get(k, s = sessionStorage) { try { return s.getItem(k); } catch { return null; } },
+          set(k, v, s = sessionStorage) { try { s.setItem(k, v); } catch {} },
+          del(k, s = sessionStorage) { try { s.removeItem(k); } catch {} },
+        };
+
+        let toastTimer;
+        function toast(text, kind = "") {
+          $(".toast")?.remove();
+          const t = h("div", { class: `toast ${kind}`, role: "status" }, text);
+          document.body.append(t);
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => t.remove(), kind === "error" ? 6000 : 3000);
+        }
+        const errText = (code) => ERRORS[code] || `Սխալ․ ${code}`;
+
+        /* ------------------------------------------------------------ API */
+        let token = store.get(TOKEN_KEY);
+        async function api(action, payload = {}) {
+          if (!ENDPOINT) throw new Error("Endpoint չկա content.js-ում");
+          let res;
+          try {
+            res = await fetch(ENDPOINT, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action, token, ...payload }),
+            });
+          } catch {
+            throw Object.assign(new Error(errText("network")), { code: "network" });
+          }
+          let data;
+          try { data = await res.json(); } catch { throw Object.assign(new Error(errText("network")), { code: "network" }); }
+          if (!data.ok) {
+            if (data.error === "unauthorized") { logout(true); }
+            throw Object.assign(new Error(errText(data.error)), { code: data.error, data });
+          }
+          return data;
+        }
+
+        /* ------------------------------------------------------- model */
+        // htmlTexts: key -> { en, kind } parsed from the live index.html (English defaults)
+        let htmlTexts = {};
+        let keyOrder = [];
+        let serverStamp = "";
+        let savedContent = null; // last published edits (diff form)
+        let work = null; // full editable model
+
+        const originalProgramKeys = new Set((DEFAULTS.programs || []).map((p) => p.key));
+        const PROGRAM_TEXT_FIELDS = [
+          ["course", "title", "Անվանում"],
+          ["course", "category", "Կատեգորիա (վերնագրի վերևում)"],
+          ["course", "description", "Նկարագրություն"],
+          ["course", "duration", "Տևողություն"],
+          ["course", "audience", "Լսարան"],
+          ["upcoming", "description", "Կարճ նկարագրություն «Մոտակա դասընթացներ»-ում"],
+          ["upcoming", "meta", "Մեկնարկ · տևողություն «Մոտակա դասընթացներ»-ում"],
+        ];
+        const THEMES = { investment: "Մուգ կանաչ (ներդրումներ)", esg: "Կանաչ (ESG)", applied: "Մոխրակապույտ (կիրառական)", executive: "Ամենամուգ (executive)" };
+        const BRANDS = { efpa: "EFPA", ybs: "YBS", uba: "UBA", none: "Առանց լոգոյի" };
+        const FORMATS = { offline: "Offline (առկա)", online: "Online", hybrid: "Hybrid (խառը)" };
+        const STATUSES = { enrolling: "Ընդունելություն", open: "Դիմումներն ընդունվում են", deadline: "Վերջնաժամկետ", active: "Ընթացիկ հոսք" };
+        const LABELS = Object.fromEntries(PROGRAM_TEXT_FIELDS.map(([a, b, l]) => [`${a}.${b}`, l]));
+        const facultyIds = new Set((DEFAULTS.faculty || []).map((p) => `faculty.${p.id}`));
+        const excludedFromTexts = (key) => facultyIds.has(key) || /^modal\.intake\./.test(key);
+
+        async function loadHtmlTexts() {
+          const res = await fetch("index.html", { cache: "no-store" });
+          const doc = new DOMParser().parseFromString(await res.text(), "text/html");
+          const add = (key, en, kind) => {
+            if (!key || htmlTexts[key]) return;
+            htmlTexts[key] = { en: (en || "").replace(/\s+/g, " ").trim(), kind };
+            keyOrder.push(key);
+          };
+          $$("*", doc).forEach((el) => {
+            if (el.dataset.i18n) add(el.dataset.i18n, el.textContent, "text");
+            if (el.dataset.i18nHtml) add(el.dataset.i18nHtml, el.innerHTML, "html");
+            if (el.dataset.i18nPlaceholder) add(el.dataset.i18nPlaceholder, el.getAttribute("placeholder"), "placeholder");
+            if (el.dataset.i18nAriaLabel) add(el.dataset.i18nAriaLabel, el.getAttribute("aria-label"), "aria");
+          });
+          // keys that exist only in translations
+          for (const lang of ["ru", "hy"])
+            for (const key of Object.keys(DEFAULTS.translations?.[lang] || {}))
+              if (!htmlTexts[key]) { htmlTexts[key] = { en: "", kind: "text" }; keyOrder.push(key); }
+        }
+
+        function defaultModel() {
+          const texts = { en: {}, ru: {}, hy: {} };
+          for (const key of keyOrder) {
+            texts.en[key] = htmlTexts[key].en;
+            texts.ru[key] = DEFAULTS.translations?.ru?.[key] ?? "";
+            texts.hy[key] = DEFAULTS.translations?.hy?.[key] ?? "";
+          }
+          return {
+            texts,
+            intakes: clone(DEFAULTS.intakes || {}),
+            tuition: clone(DEFAULTS.tuition || {}),
+            partners: clone(DEFAULTS.partners || []),
+            faculty: clone(DEFAULTS.faculty || []),
+            programs: clone(DEFAULTS.programs || []),
+          };
+        }
+
+        function modelFromContent(content) {
+          const m = defaultModel();
+          const c = content || {};
+          for (const lang of LANGS) Object.assign(m.texts[lang], c.texts?.[lang] || {});
+          if (c.intakes) Object.assign(m.intakes, c.intakes);
+          if (c.tuition) Object.assign(m.tuition, clone(c.tuition));
+          if (Array.isArray(c.partners)) m.partners = clone(c.partners);
+          if (Array.isArray(c.faculty)) m.faculty = clone(c.faculty);
+          if (Array.isArray(c.programs)) m.programs = clone(c.programs);
+          return m;
+        }
+
+        // Only store what differs from code defaults, so future code updates still apply.
+        function contentFromModel(m) {
+          const d = defaultModel();
+          const out = { texts: { en: {}, ru: {}, hy: {} } };
+          for (const lang of LANGS)
+            for (const [key, value] of Object.entries(m.texts[lang]))
+              if ((d.texts[lang][key] ?? "") !== value) out.texts[lang][key] = value;
+          const intakes = {};
+          for (const [k, v] of Object.entries(m.intakes)) if (d.intakes[k] !== v) intakes[k] = v;
+          if (Object.keys(intakes).length) out.intakes = intakes;
+          if (!same(m.tuition, d.tuition)) out.tuition = m.tuition;
+          if (!same(m.partners, d.partners)) out.partners = m.partners;
+          if (!same(m.faculty, d.faculty)) out.faculty = m.faculty;
+          if (!same(m.programs, d.programs)) out.programs = m.programs;
+          return out;
+        }
+
+        function isDirty() {
+          return !same(contentFromModel(work), contentFromModel(modelFromContent(savedContent)));
+        }
+        let draftTimer;
+        function changed() {
+          const dirty = isDirty();
+          const s = $("#save-state");
+          s.textContent = dirty ? "Կան չպահպանված փոփոխություններ" : "Պահպանված է";
+          s.classList.toggle("dirty", dirty);
+          $("#save-btn").disabled = !dirty;
+          clearTimeout(draftTimer);
+          draftTimer = setTimeout(() => {
+            if (dirty) store.set(DRAFT_KEY, JSON.stringify({ base: serverStamp, content: contentFromModel(work) }), localStorage);
+            else store.del(DRAFT_KEY, localStorage);
+          }, 400);
+          $("#count-faculty").textContent = work.faculty.length;
+          $("#count-partners").textContent = work.partners.length;
+        }
+
+        /* ------------------------------------------------------- boot */
+        async function boot() {
+          $("#login-view").hidden = true;
+          $("#app").hidden = false;
+          try {
+            if (!keyOrder.length) await loadHtmlTexts();
+            const data = await api("getContent");
+            serverStamp = data.updatedAt || "";
+            savedContent = data.content || null;
+            work = modelFromContent(savedContent);
+            const draft = (() => { try { return JSON.parse(store.get(DRAFT_KEY, localStorage) || "null"); } catch { return null; } })();
+            if (draft && draft.content && !same(draft.content, contentFromModel(work))) {
+              if (confirm("Գտնվել են նախորդ անգամ չպահպանված փոփոխություններ։ Վերականգնե՞լ դրանք։")) {
+                work = modelFromContent(draft.content);
+                if (draft.base !== serverStamp) toast("Ուշադրություն․ սերվերում կայքն այդ ընթացքում փոխվել է։", "error");
+              } else store.del(DRAFT_KEY, localStorage);
+            }
+            $("#boot-loading").hidden = true;
+            buildTextGroups();
+            changed();
+            showTab(location.hash.slice(1) || "texts");
+          } catch (error) {
+            if (error.code === "unauthorized") return;
+            $("#boot-loading").textContent = error.message;
+          }
+        }
+
+        $("#login-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const btn = $("#login-btn");
+          const errBox = $("#login-error");
+          errBox.hidden = true;
+          btn.disabled = true;
+          btn.textContent = "Ստուգվում է…";
+          try {
+            const data = await api("login", { password: event.target.password.value });
+            token = data.token;
+            store.set(TOKEN_KEY, token);
+            event.target.reset();
+            boot();
+          } catch (error) {
+            errBox.textContent = error.message;
+            errBox.hidden = false;
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Մուտք";
+          }
+        });
+
+        function logout(expired = false) {
+          if (!expired && token) api("logout").catch(() => {});
+          token = null;
+          store.del(TOKEN_KEY);
+          $("#app").hidden = true;
+          $("#login-view").hidden = false;
+          if (expired) {
+            const e = $("#login-error");
+            e.textContent = errText("unauthorized") + (work && isDirty() ? " Ձեր չպահպանված փոփոխությունները պահված են այս դիտարկիչում։" : "");
+            e.hidden = false;
+          }
+          $("#login-form input").focus();
+        }
+        $("#logout").addEventListener("click", () => {
+          if (work && isDirty() && !confirm("Կան չպահպանված փոփոխություններ (դրանք կմնան այս դիտարկիչում)։ Դուրս գա՞լ։")) return;
+          logout();
+        });
+
+        window.addEventListener("beforeunload", (event) => {
+          if (work && token && isDirty()) { event.preventDefault(); event.returnValue = ""; }
+        });
+
+        /* ------------------------------------------------------- save */
+        async function save(force = false) {
+          const btn = $("#save-btn");
+          btn.disabled = true;
+          btn.textContent = "Պահպանվում է…";
+          const content = contentFromModel(work);
+          try {
+            const payload = { content };
+            if (!force) payload.baseUpdatedAt = serverStamp;
+            const data = await api("saveContent", payload);
+            serverStamp = data.updatedAt;
+            savedContent = content;
+            store.del(DRAFT_KEY, localStorage);
+            toast("Հրապարակված է։ Կայքում կերևա մի քանի վայրկյանից։");
+          } catch (error) {
+            if (error.code === "conflict") {
+              if (confirm("Մեկ ուրիշը (կամ այլ ներդիր) նոր է պահպանել կայքը։ Վերագրե՞լ ձեր տարբերակով։ «Cancel» — ոչինչ չփոխել։")) {
+                return save(true);
+              }
+            } else toast(error.message, "error");
+          } finally {
+            btn.innerHTML = 'Պահպանել<span class="long">&nbsp;և հրապարակել</span>';
+            changed();
+          }
+        }
+        $("#save-btn").addEventListener("click", () => save());
+        document.addEventListener("keydown", (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); if (work && isDirty()) save(); }
+        });
+
+        /* ------------------------------------------------------- tabs */
+        const renderers = {};
+        function showTab(name) {
+          if (!$(`[data-panel="${name}"]`)) name = "texts";
+          $$("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== name));
+          $$("#sidenav [data-tab]").forEach((b) => (b.dataset.tab === name ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")));
+          history.replaceState(null, "", `#${name}`);
+          renderers[name]?.();
+        }
+        $$("#sidenav [data-tab]").forEach((b) => b.addEventListener("click", () => { showTab(b.dataset.tab); $("#main").scrollIntoView({ block: "start" }); }));
+
+        function autosize(t) { t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight + 2, 420) + "px"; }
+
+        /* ------------------------------------------------------- texts */
+        const visibleLangs = new Set(LANGS);
+        const prettyKey = (key) => {
+          const m = key.match(/^(course|upcoming)\.[^.]+\.(\w+)$/);
+          const label = m && LABELS[`${m[1]}.${m[2]}`];
+          return label ? `${label} · ${key}` : key;
+        };
+        function textRow(key) {
+          const info = htmlTexts[key] || { kind: "text" };
+          const d = defaultModel();
+          const isChanged = () => LANGS.some((l) => (work.texts[l][key] ?? "") !== (d.texts[l][key] ?? ""));
+          const row = h("div", { class: "text-row", "data-key": key });
+          const resetBtn = h("button", { class: "btn small", type: "button", title: "Վերադարձնել սկզբնական տեքստը" }, "Սկզբնական");
+          const tag = info.kind === "html" ? h("span", { class: "tag", title: "Թույլատրվում են <br />, <em> թեգերը" }, "HTML") : info.kind === "placeholder" ? h("span", { class: "tag" }, "դաշտի հուշում") : info.kind === "aria" ? h("span", { class: "tag" }, "էկրանի ընթերցիչ") : null;
+          row.append(h("div", { class: "meta" }, h("span", { class: "key" }, prettyKey(key), tag), resetBtn));
+          const langs = h("div", { class: "langs", style: `--cols:${visibleLangs.size}` });
+          for (const lang of LANGS) {
+            if (!visibleLangs.has(lang)) continue;
+            const ta = h("textarea", { rows: 1, lang, "aria-label": `${key} ${LANG_LABEL[lang]}`, value: work.texts[lang][key] ?? "" });
+            ta.addEventListener("input", () => {
+              work.texts[lang][key] = ta.value;
+              autosize(ta);
+              row.classList.toggle("changed", isChanged());
+              changed();
+            });
+            langs.append(h("label", { class: "lang-cell" }, h("span", {}, LANG_LABEL[lang]), ta));
+            requestAnimationFrame(() => autosize(ta));
+          }
+          row.append(langs);
+          resetBtn.addEventListener("click", () => {
+            for (const l of LANGS) work.texts[l][key] = d.texts[l][key] ?? "";
+            row.replaceWith(textRow(key));
+            changed();
+          });
+          row.classList.toggle("changed", isChanged());
+          return row;
+        }
+
+        function buildTextGroups() {
+          const groups = [...new Set(keyOrder.filter((k) => !excludedFromTexts(k)).map((k) => k.split(".")[0]))];
+          const sel = $("#text-group");
+          sel.replaceChildren(h("option", { value: "" }, "Բոլոր բաժինները"), ...groups.map((g) => h("option", { value: g }, GROUP_NAMES[g] || g)));
+        }
+
+        let textRenderTimer;
+        renderers.texts = function renderTexts() {
+          const q = $("#text-search").value.trim().toLowerCase();
+          const group = $("#text-group").value;
+          const onlyChanged = $("#text-changed").checked;
+          const d = defaultModel();
+          const list = $("#text-list");
+          list.replaceChildren();
+          let lastGroup = null;
+          let shown = 0;
+          for (const key of keyOrder) {
+            if (excludedFromTexts(key)) continue;
+            const g = key.split(".")[0];
+            if (group && g !== group) continue;
+            if (onlyChanged && !LANGS.some((l) => (work.texts[l][key] ?? "") !== (d.texts[l][key] ?? ""))) continue;
+            if (q && !(key.toLowerCase().includes(q) || LANGS.some((l) => (work.texts[l][key] || "").toLowerCase().includes(q)))) continue;
+            if (g !== lastGroup) { list.append(h("h3", { class: "group-title" }, GROUP_NAMES[g] || g)); lastGroup = g; }
+            list.append(textRow(key));
+            shown++;
+            if (shown > 400) break;
+          }
+          if (!shown) list.append(h("div", { class: "empty" }, "Ոչինչ չի գտնվել։"));
+        };
+        $("#text-search").addEventListener("input", () => { clearTimeout(textRenderTimer); textRenderTimer = setTimeout(renderers.texts, 200); });
+        $("#text-group").addEventListener("change", () => renderers.texts());
+        $("#text-changed").addEventListener("change", () => renderers.texts());
+        $$("#text-langs button").forEach((b) => b.addEventListener("click", () => {
+          const l = b.dataset.lang;
+          if (visibleLangs.has(l) && visibleLangs.size > 1) visibleLangs.delete(l); else visibleLangs.add(l);
+          $$("#text-langs button").forEach((x) => x.setAttribute("aria-pressed", String(visibleLangs.has(x.dataset.lang))));
+          renderers.texts();
+        }));
+
+        /* ------------------------------------------------------- programs */
+        let programLang = "hy";
+        $$("#program-lang button").forEach((b) => b.addEventListener("click", () => {
+          programLang = b.dataset.lang;
+          $$("#program-lang button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+          renderers.programs();
+        }));
+
+        function getIntake(key, lang) {
+          return lang === "en" ? work.intakes[key] ?? "" : work.texts[lang][`modal.intake.${key}`] ?? "";
+        }
+        function setIntake(key, lang, value) {
+          if (lang === "en") work.intakes[key] = value;
+          else work.texts[lang][`modal.intake.${key}`] = value;
+        }
+
+        function priceEditor(programKey) {
+          const wrap = h("div");
+          const draw = () => {
+            wrap.replaceChildren();
+            work.tuition[programLang] ||= {};
+            const rows = work.tuition[programLang][programKey];
+            const fallback = programKey !== "default";
+            if (!rows || !rows.length) {
+              const def = work.tuition[programLang].default?.[0]?.value || "";
+              wrap.append(h("p", { style: "margin:0 0 8px;color:var(--muted);font-size:14px" }, fallback ? `Գին նշված չէ — ցուցադրվում է «${def}»։` : "Դատարկ"));
+            } else {
+              wrap.append(h("div", { class: "price-row", style: "font-size:12px;color:var(--muted);margin-bottom:2px" }, h("span", {}, "Պայման (կարող է դատարկ լինել)"), h("span", {}, "Գին"), h("span", {})));
+              rows.forEach((row, i) => {
+                const label = h("input", { type: "text", value: row.label || "", placeholder: "օր.՝ Անհատական", "aria-label": "Պայման" });
+                const value = h("input", { type: "text", value: row.value || "", placeholder: "օր.՝ 249,000 AMD", "aria-label": "Գին" });
+                label.addEventListener("input", () => { row.label = label.value; changed(); });
+                value.addEventListener("input", () => { row.value = value.value; changed(); });
+                const del = h("button", { class: "btn icon danger", type: "button", title: "Հեռացնել տողը", "aria-label": "Հեռացնել տողը" }, "×");
+                del.addEventListener("click", () => { rows.splice(i, 1); if (!rows.length && fallback) delete work.tuition[programLang][programKey]; draw(); changed(); });
+                wrap.append(h("div", { class: "price-row" }, label, value, del));
+              });
+            }
+            const add = h("button", { class: "btn small", type: "button" }, "+ Ավելացնել գնի տող");
+            add.addEventListener("click", () => {
+              (work.tuition[programLang][programKey] ||= []).push({ label: "", value: "" });
+              draw();
+              changed();
+              $$("input", wrap).slice(-2)[0]?.focus();
+            });
+            const actions = h("div", { class: "row-actions" }, add);
+            if (fallback && LANGS.some((l) => l !== programLang)) {
+              const copy = h("button", { class: "btn small", type: "button", title: "Գների թվերը պատճենել մյուս լեզուներին՝ պահպանելով նրանց պայմանների տեքստը" }, "Պատճենել գները մյուս լեզուներին");
+              copy.addEventListener("click", () => {
+                const src = work.tuition[programLang][programKey] || [];
+                for (const l of LANGS) {
+                  if (l === programLang) continue;
+                  work.tuition[l] ||= {};
+                  const dst = work.tuition[l][programKey] || [];
+                  work.tuition[l][programKey] = src.map((r, i) => ({ label: dst[i]?.label ?? r.label, value: r.value }));
+                  if (!src.length) delete work.tuition[l][programKey];
+                }
+                changed();
+                toast("Գները պատճենվեցին։ Ստուգեք մյուս լեզուների պայմանների տեքստը։");
+              });
+              actions.append(copy);
+            }
+            wrap.append(actions);
+          };
+          draw();
+          return wrap;
+        }
+
+        function programTextKeys(key) {
+          const fromHtml = keyOrder.filter((k) => k.startsWith(`course.${key}.`) || k.startsWith(`upcoming.${key}.`));
+          if (originalProgramKeys.has(key) && fromHtml.length) return fromHtml;
+          return PROGRAM_TEXT_FIELDS.map(([a, b]) => `${a}.${key}.${b}`);
+        }
+        function selectField(label, options, value, onChange) {
+          const sel = h("select", {}, Object.entries(options).map(([v, t]) => h("option", { value: v }, t)));
+          sel.value = value;
+          sel.addEventListener("change", () => onChange(sel.value));
+          return h("label", { class: "field" }, label, sel);
+        }
+
+        renderers.programs = function renderPrograms(focusKey) {
+          const list = $("#program-list");
+          list.replaceChildren();
+          work.programs.forEach((prog, i) => {
+            const key = prog.key;
+            const isOriginal = originalProgramKeys.has(key);
+            const title = work.texts[programLang][`course.${key}.title`] || work.texts.en[`course.${key}.title`] || prog.course;
+            const intake = h("input", { type: "text", value: getIntake(key, programLang), placeholder: "օր.՝ 20 սեպտեմբերի, 2026" });
+            intake.addEventListener("input", () => { setIntake(key, programLang, intake.value); changed(); });
+
+            const badges = h("span", { class: "row-actions" },
+              prog.hidden ? h("span", { class: "tag" }, "թաքցված") : null,
+              prog.upcoming && !prog.hidden ? h("span", { class: "tag" }, "մոտակա") : null,
+              !isOriginal ? h("span", { class: "tag" }, "նոր") : null);
+            const up = h("button", { class: "btn icon", type: "button", "aria-label": "Վեր" }, "↑");
+            const down = h("button", { class: "btn icon", type: "button", "aria-label": "Վար" }, "↓");
+            up.addEventListener("click", () => { moveItem(work.programs, i, -1); renderPrograms(); changed(); });
+            down.addEventListener("click", () => { moveItem(work.programs, i, 1); renderPrograms(); changed(); });
+            const hide = h("input", { type: "checkbox", checked: !!prog.hidden });
+            hide.addEventListener("change", () => { if (hide.checked) prog.hidden = true; else delete prog.hidden; renderPrograms(); changed(); });
+            const upcoming = h("input", { type: "checkbox", checked: !!prog.upcoming });
+            upcoming.addEventListener("change", () => { prog.upcoming = upcoming.checked; renderPrograms(); changed(); });
+            const actions = h("span", { class: "row-actions" }, up, down);
+            if (!isOriginal) {
+              const del = h("button", { class: "btn small danger", type: "button" }, "Ջնջել");
+              del.addEventListener("click", () => {
+                if (!confirm(`Ջնջե՞լ «${title}» ծրագիրը։`)) return;
+                work.programs.splice(i, 1);
+                for (const l of LANGS) for (const k of [...programTextKeys(key), `modal.intake.${key}`]) delete work.texts[l][k];
+                delete work.intakes[key];
+                for (const l of LANGS) if (work.tuition[l]) delete work.tuition[l][key];
+                renderPrograms();
+                changed();
+              });
+              actions.append(del);
+            }
+
+            const settings = h("div", { class: "program-settings" },
+              selectField("Գույն", THEMES, prog.theme || "investment", (v) => { prog.theme = v; changed(); }),
+              prog.layout === "workshop" ? null : selectField("Լոգո", BRANDS, prog.brand || "none", (v) => { prog.brand = v; changed(); }),
+              prog.layout === "workshop" ? null : selectField("Ձևաչափ", FORMATS, prog.format || "offline", (v) => { prog.format = v; changed(); }),
+              selectField("Կարգավիճակ «Մոտակա»-ում", STATUSES, prog.status || "enrolling", (v) => { prog.status = v; changed(); }));
+
+            const textKeys = programTextKeys(key);
+            const more = h("details", { class: "more" }, h("summary", {}, `Քարտի տեքստեր 3 լեզվով (${textKeys.length})`));
+            const fillMore = () => { if (more.children.length === 1) textKeys.forEach((k) => more.append(textRow(k))); };
+            more.addEventListener("toggle", () => { if (more.open) fillMore(); });
+            if (focusKey === key) { more.open = true; fillMore(); }
+
+            const card = h("article", { class: `card program${prog.hidden ? " is-hidden" : ""}`, "data-program": key },
+              h("div", { class: "program-head" }, h("h3", {}, title, " ", badges), actions),
+              h("div", { class: "row-actions", style: "gap:18px" },
+                h("label", { class: "check" }, upcoming, "Ցույց տալ «Մոտակա դասընթացներ»-ում"),
+                h("label", { class: "check" }, hide, "Թաքցնել կայքից")),
+              settings,
+              h("label", { class: "field" }, `Մեկնարկ / ընդունելություն · ${LANG_LABEL[programLang]}`, intake),
+              h("div", { class: "field" }, h("span", { style: "font-size:13px;color:var(--muted);font-weight:500" }, `Գներ · ${LANG_LABEL[programLang]}`), priceEditor(key)),
+              more,
+              h("small", { style: "color:var(--muted)" }, `Անվանումը հայտերի աղյուսակում՝ ${prog.course}`));
+            list.append(card);
+          });
+          list.append(h("article", { class: "card program" },
+            h("div", { class: "program-head" }, h("h3", {}, PROGRAM_NAMES_FALLBACK.default)),
+            priceEditor("default")));
+          if (focusKey) $(`[data-program="${focusKey}"]`)?.scrollIntoView({ block: "start" });
+        };
+
+        $("#add-program").addEventListener("click", () => {
+          const name = (prompt("Նոր ծրագրի անվանումը (անգլերեն, կերևա նաև հայտերի աղյուսակում)։") || "").trim();
+          if (!name) return;
+          if (work.programs.some((p) => p.course.toLowerCase() === name.toLowerCase())) return toast("Այդ անվանումով ծրագիր արդեն կա։", "error");
+          const key = "p" + Date.now().toString(36);
+          work.programs.push({ key, course: name, theme: "investment", brand: "none", format: "offline", upcoming: false, status: "enrolling" });
+          for (const l of LANGS) {
+            work.texts[l][`course.${key}.title`] = name;
+          }
+          work.intakes[key] = "";
+          changed();
+          renderers.programs(key);
+          toast("Ծրագիրն ավելացված է։ Լրացրեք տեքստերը, գները և սեղմեք «Պահպանել և հրապարակել»։");
+        });
+
+        /* ------------------------------------------------------- images */
+        async function pickAndUpload({ maxSide, prefix, keepSvg = true }) {
+          const input = h("input", { type: "file", accept: "image/png,image/jpeg,image/webp,image/svg+xml,image/gif" });
+          const file = await new Promise((resolve) => { input.addEventListener("change", () => resolve(input.files[0])); input.click(); });
+          if (!file) return null;
+          if (file.size > 15 * 1024 * 1024) { toast("Ֆայլը չափազանց մեծ է (մաքսիմում 15 ՄԲ)։", "error"); return null; }
+          let blob = file;
+          let mimeType = file.type;
+          let name = `${prefix}-${file.name}`;
+          if (!(keepSvg && file.type === "image/svg+xml") && file.type !== "image/gif") {
+            blob = await compress(file, maxSide);
+            mimeType = blob.type;
+            name = name.replace(/\.[a-z0-9]+$/i, "") + (mimeType === "image/webp" ? ".webp" : ".png");
+          }
+          const base64 = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(String(r.result).split(",")[1]);
+            r.onerror = reject;
+            r.readAsDataURL(blob);
+          });
+          toast("Նկարը վերբեռնվում է…");
+          const data = await api("uploadImage", { name, mimeType, base64 });
+          toast("Նկարը վերբեռնված է։");
+          return data.url;
+        }
+        async function compress(file, maxSide) {
+          const url = URL.createObjectURL(file);
+          try {
+            const img = await new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = reject; i.src = url; });
+            const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+            const c = document.createElement("canvas");
+            c.width = Math.round(img.naturalWidth * scale);
+            c.height = Math.round(img.naturalHeight * scale);
+            c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+            const out = await new Promise((resolve) => c.toBlob(resolve, "image/webp", 0.86));
+            return out && out.type === "image/webp" ? out : await new Promise((resolve) => c.toBlob(resolve, "image/png"));
+          } finally {
+            URL.revokeObjectURL(url);
+          }
+        }
+        function assetUrl(path, folder) {
+          if (!path) return "";
+          if (/^(https?:)?\/\//.test(path) || path.startsWith("data:") || path.includes("/")) return path;
+          return `assets/${folder}/${path}`;
+        }
+        function moveItem(arr, i, dir) {
+          const j = i + dir;
+          if (j < 0 || j >= arr.length) return;
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+
+        /* ------------------------------------------------------- faculty */
+        renderers.faculty = function renderFaculty() {
+          const list = $("#faculty-list");
+          list.replaceChildren();
+          work.faculty.forEach((p, i) => {
+            p.role ||= { en: "", ru: "", hy: "" };
+            const photo = h("div", { class: "photo", role: "img", "aria-label": p.name });
+            const setPhoto = () => (photo.style.backgroundImage = p.photo ? `url("${assetUrl(p.photo, "faculty").replace(/"/g, "%22")}")` : "");
+            setPhoto();
+            const upload = h("button", { class: "btn small", type: "button" }, "Վերբեռնել նկար");
+            upload.addEventListener("click", async () => {
+              try {
+                const url = await pickAndUpload({ maxSide: 900, prefix: "faculty", keepSvg: false });
+                if (url) { p.photo = url; setPhoto(); changed(); }
+              } catch (e) { toast(e.message, "error"); }
+            });
+            const name = h("input", { type: "text", value: p.name || "", placeholder: "Անուն Ազգանուն (լատինատառ)" });
+            name.addEventListener("input", () => { p.name = name.value; changed(); });
+            const roles = LANGS.map((l) => {
+              const ta = h("textarea", { rows: 2, lang: l, value: p.role[l] || "" });
+              ta.addEventListener("input", () => { p.role[l] = ta.value; autosize(ta); changed(); });
+              requestAnimationFrame(() => autosize(ta));
+              return h("label", { class: "lang-cell" }, h("span", {}, `ՊԱՇՏՈՆ · ${LANG_LABEL[l]}`), ta);
+            });
+            const hide = h("input", { type: "checkbox", checked: !!p.hidden });
+            hide.addEventListener("change", () => { p.hidden = hide.checked || undefined; if (!p.hidden) delete p.hidden; card.classList.toggle("is-hidden", !!p.hidden); changed(); });
+            const up = h("button", { class: "btn icon", type: "button", title: "Առաջ", "aria-label": "Տեղափոխել առաջ" }, "↑");
+            const down = h("button", { class: "btn icon", type: "button", title: "Հետ", "aria-label": "Տեղափոխել հետ" }, "↓");
+            const del = h("button", { class: "btn small danger", type: "button" }, "Ջնջել");
+            up.addEventListener("click", () => { moveItem(work.faculty, i, -1); renderFaculty(); changed(); });
+            down.addEventListener("click", () => { moveItem(work.faculty, i, 1); renderFaculty(); changed(); });
+            del.addEventListener("click", () => { if (confirm(`Ջնջե՞լ ${p.name || "դասախոսին"}։`)) { work.faculty.splice(i, 1); renderFaculty(); changed(); } });
+            const card = h("article", { class: `card person-card${p.hidden ? " is-hidden" : ""}` },
+              h("div", { class: "photo-line" }, photo, h("div", { class: "stack", style: "gap:8px;flex:1;min-width:0" }, name, h("div", { class: "row-actions" }, upload))),
+              ...roles,
+              h("div", { class: "row-actions", style: "justify-content:space-between" },
+                h("label", { class: "check" }, hide, "Թաքցնել"),
+                h("span", { class: "row-actions" }, up, down, del)));
+            list.append(card);
+          });
+          if (!work.faculty.length) list.append(h("div", { class: "empty" }, "Դասախոսներ չկան։"));
+        };
+        $("#add-person").addEventListener("click", () => {
+          work.faculty.push({ id: `p${Date.now()}`, name: "", photo: "", role: { en: "", ru: "", hy: "" } });
+          renderers.faculty();
+          changed();
+          const inputs = $$("#faculty-list input[type=text]");
+          inputs[inputs.length - 1]?.focus();
+          inputs[inputs.length - 1]?.scrollIntoView({ block: "center" });
+        });
+
+        /* ------------------------------------------------------- partners */
+        renderers.partners = function renderPartners() {
+          const list = $("#partner-list");
+          list.replaceChildren();
+          work.partners.forEach((p, i) => {
+            const logo = h("div", { class: "logo-box", role: "img", "aria-label": p.name });
+            const setLogo = () => {
+              logo.style.backgroundImage = p.logo ? `url("${assetUrl(p.logo, "partners").replace(/"/g, "%22")}")` : "";
+              logo.style.filter = p.darken ? "brightness(0.25)" : "";
+            };
+            setLogo();
+            const name = h("input", { type: "text", value: p.name || "", placeholder: "Կազմակերպության անվանում" });
+            name.addEventListener("input", () => { p.name = name.value; changed(); });
+            const upload = h("button", { class: "btn small", type: "button" }, "Վերբեռնել լոգո");
+            upload.addEventListener("click", async () => {
+              try {
+                const url = await pickAndUpload({ maxSide: 600, prefix: "partner" });
+                if (url) { p.logo = url; setLogo(); changed(); }
+              } catch (e) { toast(e.message, "error"); }
+            });
+            const darken = h("input", { type: "checkbox", checked: !!p.darken });
+            darken.addEventListener("change", () => { if (darken.checked) p.darken = true; else delete p.darken; setLogo(); changed(); });
+            const hide = h("input", { type: "checkbox", checked: !!p.hidden });
+            hide.addEventListener("change", () => { if (hide.checked) p.hidden = true; else delete p.hidden; row.classList.toggle("is-hidden", !!p.hidden); changed(); });
+            const up = h("button", { class: "btn icon", type: "button", "aria-label": "Վեր" }, "↑");
+            const down = h("button", { class: "btn icon", type: "button", "aria-label": "Վար" }, "↓");
+            const del = h("button", { class: "btn small danger", type: "button" }, "Ջնջել");
+            up.addEventListener("click", () => { moveItem(work.partners, i, -1); renderPartners(); changed(); });
+            down.addEventListener("click", () => { moveItem(work.partners, i, 1); renderPartners(); changed(); });
+            del.addEventListener("click", () => { if (confirm(`Ջնջե՞լ ${p.name || "գործընկերոջը"}։`)) { work.partners.splice(i, 1); renderPartners(); changed(); } });
+            const row = h("article", { class: `card partner-row${p.hidden ? " is-hidden" : ""}` }, logo,
+              h("div", { class: "partner-fields" }, name, h("div", { class: "row-actions" }, upload),
+                h("div", { class: "row-actions", style: "justify-content:space-between" },
+                  h("span", { class: "row-actions", style: "gap:14px" }, h("label", { class: "check" }, darken, "Մգեցնել"), h("label", { class: "check" }, hide, "Թաքցնել")),
+                  h("span", { class: "row-actions" }, up, down, del))));
+            list.append(row);
+          });
+          if (!work.partners.length) list.append(h("div", { class: "empty" }, "Գործընկերներ չկան։"));
+        };
+        $("#add-partner").addEventListener("click", () => {
+          work.partners.push({ name: "", logo: "" });
+          renderers.partners();
+          changed();
+          const inputs = $$("#partner-list input[type=text]");
+          inputs[inputs.length - 1]?.focus();
+          inputs[inputs.length - 1]?.scrollIntoView({ block: "center" });
+        });
+
+        /* ------------------------------------------------------- applications */
+        let apps = null;
+        async function loadApps() {
+          $("#apps-body").replaceChildren(h("div", { class: "loading" }, "Բեռնվում է…"));
+          try {
+            apps = await api("applications", { limit: 2000 });
+            $("#count-apps").textContent = apps.total;
+            if (apps.sheetUrl) { $("#apps-sheet").href = apps.sheetUrl; $("#apps-sheet").hidden = false; }
+            const pIdx = apps.header.findIndex((x) => /program/i.test(x));
+            const programs = [...new Set(apps.rows.map((r) => r[pIdx]).filter(Boolean))].sort();
+            $("#apps-program").replaceChildren(h("option", { value: "" }, "Բոլոր ծրագրերը"), ...programs.map((p) => h("option", { value: p }, p)));
+            drawApps();
+          } catch (e) {
+            $("#apps-body").replaceChildren(h("div", { class: "msg error" }, e.message));
+          }
+        }
+        const HEAD_HY = { "Submitted at": "Ամսաթիվ", "First name": "Անուն", "Last name": "Ազգանուն", Email: "Email", Phone: "Հեռախոս", Program: "Ծրագիր", "Professional goal": "Նպատակ", Consent: "Համաձայնություն", Language: "Լեզու", Source: "Աղբյուր" };
+        function filteredApps() {
+          if (!apps) return [];
+          const q = $("#apps-search").value.trim().toLowerCase();
+          const prog = $("#apps-program").value;
+          const pIdx = apps.header.findIndex((x) => /program/i.test(x));
+          return apps.rows.filter((r) => (!prog || r[pIdx] === prog) && (!q || r.join(" ").toLowerCase().includes(q)));
+        }
+        function fmtDate(v) {
+          const d = new Date(v);
+          return isNaN(d) || !/\d{4}-\d{2}-\d{2}T/.test(v) ? v : d.toLocaleString("hy-AM", { dateStyle: "short", timeStyle: "short" });
+        }
+        function drawApps() {
+          const rows = filteredApps();
+          $("#apps-count").textContent = rows.length;
+          if (!apps.rows.length) { $("#apps-body").replaceChildren(h("div", { class: "empty card" }, "Հայտեր դեռ չկան։")); return; }
+          const dateIdx = apps.header.findIndex((x) => /submitted/i.test(x));
+          const emailIdx = apps.header.findIndex((x) => /email/i.test(x));
+          const phoneIdx = apps.header.findIndex((x) => /phone/i.test(x));
+          const table = h("table", {},
+            h("thead", {}, h("tr", {}, apps.header.map((x) => h("th", {}, HEAD_HY[x] || x)))),
+            h("tbody", {}, rows.slice(0, 1000).map((r) => h("tr", {}, r.map((cell, i) => {
+              if (i === emailIdx && cell) return h("td", {}, h("a", { href: `mailto:${cell}` }, cell));
+              if (i === phoneIdx && cell) return h("td", { style: "white-space:nowrap" }, h("a", { href: `tel:${cell.replace(/[^\d+]/g, "")}` }, cell));
+              if (i === dateIdx) return h("td", { style: "white-space:nowrap" }, fmtDate(cell));
+              return h("td", {}, cell);
+            })))));
+          $("#apps-body").replaceChildren(h("div", { class: "table-wrap" }, table));
+        }
+        renderers.applications = () => { if (!apps) loadApps(); };
+        $("#apps-refresh").addEventListener("click", loadApps);
+        $("#apps-search").addEventListener("input", () => apps && drawApps());
+        $("#apps-program").addEventListener("change", () => apps && drawApps());
+        $("#apps-csv").addEventListener("click", () => {
+          if (!apps) return;
+          const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+          const csv = "﻿" + [apps.header, ...filteredApps()].map((r) => r.map(esc).join(",")).join("\r\n");
+          download(new Blob([csv], { type: "text/csv;charset=utf-8" }), `ybs-hayter-${new Date().toISOString().slice(0, 10)}.csv`);
+        });
+        function download(blob, filename) {
+          const a = h("a", { href: URL.createObjectURL(blob), download: filename });
+          document.body.append(a);
+          a.click();
+          setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+        }
+
+        /* ------------------------------------------------------- history */
+        async function loadHistory() {
+          const list = $("#history-list");
+          list.replaceChildren(h("div", { class: "loading" }, "Բեռնվում է…"));
+          try {
+            const data = await api("history");
+            list.replaceChildren();
+            if (!data.items.length) list.append(h("div", { class: "empty card" }, "Դեռ ոչինչ չի հրապարակվել ադմինկայից։"));
+            data.items.forEach((it, idx) => {
+              const btn = h("button", { class: "btn small", type: "button", disabled: idx === 0 }, idx === 0 ? "Ընթացիկ" : "Վերականգնել");
+              btn.addEventListener("click", async () => {
+                if (isDirty() && !confirm("Կան չպահպանված փոփոխություններ, դրանք կկորեն։ Շարունակե՞լ։")) return;
+                if (!confirm("Վերականգնել այս տարբերակը և հրապարակել կայքում։")) return;
+                btn.disabled = true;
+                try {
+                  await api("restore", { id: it.id });
+                  const c = await api("getContent");
+                  serverStamp = c.updatedAt;
+                  savedContent = c.content;
+                  work = modelFromContent(savedContent);
+                  store.del(DRAFT_KEY, localStorage);
+                  changed();
+                  toast("Տարբերակը վերականգնված և հրապարակված է։");
+                  loadHistory();
+                } catch (e) { toast(e.message, "error"); btn.disabled = false; }
+              });
+              list.append(h("div", { class: "card history-item" },
+                h("div", {}, h("strong", {}, new Date(it.date).toLocaleString("hy-AM", { dateStyle: "medium", timeStyle: "short" })), it.note ? h("div", {}, h("small", {}, it.note)) : null),
+                btn));
+            });
+          } catch (e) { list.replaceChildren(h("div", { class: "msg error" }, e.message)); }
+        }
+        renderers.history = loadHistory;
+        $("#history-refresh").addEventListener("click", loadHistory);
+
+        /* ------------------------------------------------------- settings */
+        $("#password-form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const f = e.target;
+          const msg = $("#password-msg");
+          const show = (text, kind) => { msg.textContent = text; msg.className = `msg ${kind}`; msg.hidden = false; };
+          if (f.new.value !== f.repeat.value) return show("Նոր գաղտնաբառերը չեն համընկնում։", "error");
+          try {
+            await api("changePassword", { oldPassword: f.old.value, newPassword: f.new.value });
+            f.reset();
+            show("Գաղտնաբառը փոխված է։", "ok");
+          } catch (err) { show(err.message, "error"); }
+        });
+        $("#export-json").addEventListener("click", () => {
+          download(new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), content: contentFromModel(work) }, null, 2)], { type: "application/json" }), `ybs-content-${new Date().toISOString().slice(0, 10)}.json`);
+        });
+        $("#import-json").addEventListener("change", async (e) => {
+          const file = e.target.files[0];
+          e.target.value = "";
+          if (!file) return;
+          try {
+            const data = JSON.parse(await file.text());
+            const content = data.content ?? data;
+            if (!content || typeof content !== "object") throw new Error();
+            work = modelFromContent(content);
+            changed();
+            toast("Ներմուծված է։ Ստուգեք և սեղմեք «Պահպանել և հրապարակել»։");
+          } catch { toast("Ֆայլը ճիշտ ձևաչափով չէ։", "error"); }
+        });
+        $("#discard").addEventListener("click", () => {
+          if (!isDirty()) return toast("Չպահպանված փոփոխություններ չկան։");
+          if (!confirm("Չեղարկե՞լ բոլոր չպահպանված փոփոխությունները։")) return;
+          work = modelFromContent(savedContent);
+          store.del(DRAFT_KEY, localStorage);
+          changed();
+          toast("Չեղարկված է։");
+        });
+
+        /* ------------------------------------------------------- start */
+        if (!ENDPOINT) {
+          const e = $("#login-error");
+          e.textContent = "content.js-ում YBS_ENDPOINT նշված չէ։";
+          e.hidden = false;
+        } else if (token) {
+          boot();
+        } else {
+          $("#login-form input").focus();
+        }
+      })();
+    </script>
+  </body>
+</html>
