@@ -1,10 +1,17 @@
-# Netlify build settings (read automatically when the site is linked to this repo)
+# Netlify settings (read automatically when the site is linked to this repo).
+#
+# The site itself is plain HTML/CSS/JS in public/ — no build step is needed.
+# Netlify detects Next.js from package.json and adds its Next.js plugin,
+# which fails on this project (it uses vinext, not `next build`), so the
+# plugin is switched off and public/ is published as-is.
+
 [build]
-  command = "npm run build"
-  publish = "dist/client"
+  command = "echo 'Static site: publishing public/'"
+  publish = "public"
 
 [build.environment]
   NODE_VERSION = "22"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 # Keep the admin panel out of search engines
 [[headers]]
@@ -13,7 +20,7 @@
     X-Robots-Tag = "noindex, nofollow"
     Cache-Control = "no-cache"
 
-# Always check for a fresh page so edits to the code show up right away
+# Always check for a fresh page so code updates show up right away
 [[headers]]
   for = "/*.html"
   [headers.values]
